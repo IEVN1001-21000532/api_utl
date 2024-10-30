@@ -49,7 +49,29 @@ def leer_alumno_bd(matricula):
             return None
     except Exception as ex:
         return jsonify({"message": "error {}".format(ex),'exito':False})#, 500
-   
+
+
+@app.route("/alumnos",methods=['POST'])
+def registrar_alumno():
+    try:
+        alumno=leer_alumno_bd(request.json['matricula'])
+        if alumno !=None:
+            return jsonify ({'mensaje':"alumno ya existe, no se puede duplicar",
+                             'exito':False})
+        else:
+            cursor=con.connection.cursos()
+            sql="""insert into alumnos (matricula, nombre, apaterno, amaterno, correo)
+            values ('{0}','{1}','{2}','{3}','{4}')""".format(request.json['matricula'],
+                request.json['nombre'],request.json['apaterno'],request.json['amaterno'],
+                request.json['correo'])
+            cursor.execute(sql)
+            con.connection.commit()
+            return jsonify ({'mensaje':"alumno registrado","exito":True})
+        
+    except Exception as ex:
+        return jsonify({'mensaje':"Error",'exito':False})
+
+       
         
             
 @app.route("/alumnos/<mat>",methods=['GET'])
